@@ -1,12 +1,10 @@
 
 import * as _ from 'lodash';
 import fetch from 'node-fetch';
-import { WSFactory } from './ws-factory';
+import { Agent } from 'https';
+import * as WebSocket from 'ws';
 
-/* eslint-disable no-param-reassign */
-
-const k8sAPIURL = process.env.K8S_API;
-const k8sAPIURL_WS = process.env.K8S_API_WS;
+const k8sAPIURL = process.env.k8sAPIURL || 'kubernetes.default';
 
 export const createEquals = (key, value) => ({
   key,
@@ -112,26 +110,20 @@ export const resourceURL = ({ apiVersion, apiGroup, plural }, options) => {
   return u;
 };
 
-export const k8sList = async (kind, opts = {}) => {
+export const k8sList = async (kind, opts = {}, token) => {
   const url = resourceURL(kind, opts);
-  const result = await fetch(`${k8sAPIURL}${url}`);
+  const result = await fetch(`https://${k8sAPIURL}${url}`, {
+    agent: new Agent({ rejectUnauthorized: false }),
+    headers: {
+      Authorization: token,
+    }
+  });
   return result;
 }
 
-export const k8sWatch = ({ apiVersion, apiGroup, plural }, query = {} as any, wsOptions = {} as any) => {
+export const k8sWatch = ({ apiVersion, apiGroup, plural }, query = {} as any, token) => {
   const queryParams = { watch: true } as any;
   const opts = { queryParams } as any;
-  wsOptions = Object.assign(
-    {
-      host: 'auto',
-      reconnect: true,
-      jsonParse: true,
-      bufferFlushInterval: 500,
-      bufferMax: 1000,
-      rejectUnauthorized: false,
-    },
-    wsOptions,
-  );
 
   const labelSelector = query.labelSelector; //|| kind.labelSelector; //TODO
   if (labelSelector) {
@@ -154,6 +146,16 @@ export const k8sWatch = ({ apiVersion, apiGroup, plural }, query = {} as any, ws
   }
 
   const path = resourceURL({ apiVersion, apiGroup, plural }, opts);
-  wsOptions.path = `${k8sAPIURL_WS}${path}`;
-  return new WSFactory(path, wsOptions);
+
+  const ws = new WebSocket(
+    `wss://${k8sAPIURL}${path}`,
+    {
+      origin: 'http://localhost:4000',
+      rejectUnauthorized: false,
+      headers: {
+        Authorization: token,
+      }
+    }
+  );
+  return ws;
 };

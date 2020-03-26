@@ -43,7 +43,7 @@ export const typeDefs = `
     listResources(apiVersion: String, apiGroup: String, plural: String, ns: String, fields: [String]): ResourceList
   }
   type Subscription {
-    watchResources(apiVersion: String, apiGroup: String, plural: String, ns: String, resourceVersion: String, fields: [String]): [ResourceEvent]
+    watchResources(apiVersion: String, apiGroup: String, plural: String, ns: String, resourceVersion: String, fields: [String]): ResourceEvent
   }
 `;
 
@@ -65,12 +65,11 @@ const withCancel = <T>(
 }
 
 const pubsub = new PubSub();
-const WATCH_RESOURCES = 'WATCH_RESOURCES';
 
 export const resolvers = {
   Query: {
-    listResources: async (x, { apiVersion, apiGroup, plural, ns, fields }) => {
-      const response = await list({ apiVersion, apiGroup, plural }, { ns });
+    listResources: async (x, { apiVersion, apiGroup, plural, ns, fields }, { token }) => {
+      const response = await list({ apiVersion, apiGroup, plural }, { ns }, token);
       const result = await response.json();
       if (fields) {
         result.items = result.items.map((i) => i = _.pick(i, fields));
@@ -81,11 +80,11 @@ export const resolvers = {
   },
   Subscription: {
     watchResources: {
-      subscribe: withEventFilter((x, { apiVersion, apiGroup, plural, ns, resourceVersion }) => {
-        watch(pubsub, WATCH_RESOURCES, { kind: { apiVersion, apiGroup, plural }, opts: { ns, resourceVersion } });
-        return withCancel(pubsub.asyncIterator(WATCH_RESOURCES), () => stopWatch(WATCH_RESOURCES));
+      subscribe: withEventFilter((x, { apiVersion, apiGroup, plural, ns, resourceVersion }, { token }) => {
+        const watchID = watch(pubsub, { kind: { apiVersion, apiGroup, plural }, opts: { ns, resourceVersion } }, token);
+        return withCancel(pubsub.asyncIterator(watchID), () => stopWatch(watchID));
       }),
-      resolve: (payload) => payload.events,
+      resolve: (payload) => payload.event,
     },
   },
 };
