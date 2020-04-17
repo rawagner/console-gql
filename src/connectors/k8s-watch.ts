@@ -3,8 +3,9 @@ import * as _ from 'lodash';
 import fetch from 'node-fetch';
 import { Agent } from 'https';
 import * as WebSocket from 'ws';
+import { performance } from 'perf_hooks';
 
-const k8sAPIURL = process.env.k8sAPIURL || 'kubernetes.default';
+export const k8sAPIURL = process.env.k8sAPIURL || 'kubernetes.default';
 
 export const createEquals = (key, value) => ({
   key,
@@ -112,12 +113,15 @@ export const resourceURL = ({ apiVersion, apiGroup, plural }, options) => {
 
 export const k8sList = async (kind, opts = {}, token) => {
   const url = resourceURL(kind, opts);
+  const t1 = performance.now();
   const result = await fetch(`https://${k8sAPIURL}${url}`, {
     agent: new Agent({ rejectUnauthorized: false }),
     headers: {
       Authorization: token,
     }
   });
+  const t2 = performance.now();
+  console.log(`Call to k8s: ${(t2-t1).toFixed(4)}`);
   return result;
 }
 

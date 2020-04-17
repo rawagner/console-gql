@@ -4,5 +4,5 @@ WORKDIR /app-root
 COPY . .
 RUN npm i
 
-EXPOSE 4000
+EXPOSE 4000 8080 8888
 CMD ["npm", "start"]

@@ -23,32 +23,41 @@ export const makeID = (k8sKind = {}, query) => {
 
 export const list = async (kind, opts, token) => await k8sList(kind, opts, token);
 
-export const watch = (pubsub, { kind, opts }, token) => {
+export const watch = (pubsub, { kind, opts }, token, datasources) => {
+
   const id = makeID(kind, opts);
   // Only one watch per unique list ID
   if (id in REF_COUNTS) {
-    REF_COUNTS[id] += 1;
+    //REF_COUNTS[id] += 1;
     return null;
   }
   REF_COUNTS[id] = 1;
-  /**
-   * Incrementally fetch list (XHR) using k8s pagination then use its resourceVersion to
-   *  start listening on a WS (?resourceVersion=$resourceVersion)
-   *  start the process over when:
-   *   1. the WS closes abnormally
-   *   2. the WS can not establish a connection within $TIMEOUT
-   */
-  const pollAndWatch = async () => {
-    WS[id] = k8sWatch(kind, opts, token);
 
-    WS[id].onopen = () => console.log(`open ${id}`);
-    WS[id].onerror = () => console.log('err');
-    WS[id].onclose = () => console.log(`close ${id}`);
-    WS[id].onmessage = (event) => {
-      pubsub.publish(id, { event: JSON.parse(event.data) });
-    };
+  const onload = (response, type) => {
+    pubsub.publish(id, { event: {type, objects: response.items} })
   };
-  pollAndWatch();
+
+  datasources.k8sAPI.incrementallyLoad(kind, opts, token, onload).then((resourceVersion) => {
+    /**
+     * Incrementally fetch list (XHR) using k8s pagination then use its resourceVersion to
+     *  start listening on a WS (?resourceVersion=$resourceVersion)
+     *  start the process over when:
+     *   1. the WS closes abnormally
+     *   2. the WS can not establish a connection within $TIMEOUT
+     */
+    const pollAndWatch = async () => {
+      WS[id] = k8sWatch(kind, {...opts, resourceVersion}, token);
+
+      WS[id].onopen = () => console.log(`open ${id}`);
+      WS[id].onerror = () => console.log('err');
+      WS[id].onclose = () => console.log(`close ${id}`);
+      WS[id].onmessage = (event) => {
+        const parsed =  JSON.parse(event.data);
+        pubsub.publish(id, { event: {type: parsed.type, objects: [parsed.object]} });
+      };
+    };
+    pollAndWatch();
+  });
   return id;
 };
 

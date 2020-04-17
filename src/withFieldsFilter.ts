@@ -1,13 +1,13 @@
 import * as _ from 'lodash';
 import { $$asyncIterator } from 'iterall';
 
-const filterEvents = (payloadValue, { fields }) => {
-  const requestedObject = _.pick(payloadValue.event.object, fields);
-  payloadValue.event.object = requestedObject;
+const mapObjects = (payloadValue, { fields }) => {
+  const requestedObjects = fields ? payloadValue.event.objects.map(obj => _.pick(obj, fields)) : payloadValue.event.objects;
+  payloadValue.event.objects = requestedObjects;
   return payloadValue;
 }
 
-export const withEventFilter = (asyncIteratorFn) => {
+export const withFieldsFilter = (asyncIteratorFn) => {
   return (rootValue: any, args: any, context: any, info: any) => {
     const asyncIterator = asyncIteratorFn(rootValue, args, context, info);
 
@@ -19,7 +19,7 @@ export const withEventFilter = (asyncIteratorFn) => {
             return payload;
           }
 
-          return Promise.resolve(filterEvents(payload.value, args))
+          return Promise.resolve(mapObjects(payload.value, args))
             .catch(() => [])
             .then(filterResult => {
               payload.value = filterResult;
