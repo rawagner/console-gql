@@ -1,0 +1,25 @@
+metadata:
+  resourceVersion: '99591'
+  name: example-c55674dfd-229dz
+  uid: 2fc16b2e-0795-4be8-a485-0ba27aeaccfb
+  namespace: rawagner
+  creationTimestamp: '2020-04-26T13:31:28Z'
+status:
+  phase: Pending
+
+==============
+
+metadata:
+  resourceVersion: '22984'
+  name: example-c55674dfd-ds89g
+  uid: a64f9e88-f8e4-4bfa-ae29-c6af1145b010
+  creationTimestamp: '2020-04-27T10:47:49Z'
+  namespace: rawagner
+status:
+  phase: Running
+  containerStatuses:
+    - ready: true
+      state:
+        running:
+          reason: null
+

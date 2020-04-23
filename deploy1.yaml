@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: graphql-serving-cert
+  name: console-gql
+  namespace: rawagner
+spec:
+  ports:
+  - port: 4000
+    protocol: TCP
+    targetPort: 4000
+  selector:
+    app: console-gql
+  sessionAffinity: None
+  type: ClusterIP
+
+
+
+
+apiVersion: v1 
+kind: ConfigMap
+metadata:
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+  name: service-ca
+  namespace: rawagner
+
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: console-gql
+  name: console-gql
+  namespace: rawagner
+spec:
+  containers:
+  - env:
+    - name: k8sTOKEN
+      value: qrO8pnkN71ozH1lbo-8hXoXP6M_99X3pLZSpW3Fea48
+    - name: service-ca-file
+      value: /var/service-ca/service-ca.crt
+    image: quay.io/rawagner/console-gql
+    imagePullPolicy: Always
+    name: console-gql
+    ports:
+    - containerPort: 4000
+      protocol: TCP
+    - containerPort: 8080
+      protocol: TCP
+    resources:
+      requests:
+        cpu: "1"
+        memory: 1Gi
+    volumeMounts:
+    - mountPath: /var/serving-cert
+      name: graphql-serving-cert
+      readOnly: true
+    - mountPath: /var/service-ca
+      name: service-ca
+      readOnly: true
+  volumes:
+  - name: graphql-serving-cert
+    secret:
+      defaultMode: 420
+      secretName: graphql-serving-cert
+  - configMap:
+      defaultMode: 420
+      name: service-ca
+    name: service-ca
+
+
+

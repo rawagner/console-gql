@@ -22,7 +22,7 @@ export const resolvers = {
       );
     },
     urlFetch: (root, { url }, { token, dataSources }) => dataSources.k8sAPI.fetchJSON(url, token),
-    selfSubjectAccessReview: async (root, { group, resource, verb, namespace }, { token, dataSources }) => {
+    selfSubjectAccessReview: (root, { group, resource, verb, namespace }, { token, dataSources }) => {
       const data = {
         spec: {
           resourceAttributes: {
@@ -33,8 +33,7 @@ export const resolvers = {
           }
         }
       };
-      const result = await dataSources.k8sAPI.createResource({ apiVersion: 'v1', apiGroup: 'authorization.k8s.io', plural: 'selfsubjectaccessreviews' }, data, token);
-      return result;
+      return dataSources.k8sAPI.createResource({ apiVersion: 'v1', apiGroup: 'authorization.k8s.io', plural: 'selfsubjectaccessreviews' }, data, token);
     },
     prometheusFetch: (root, { url }, { token, dataSources }) => dataSources.promAPI.fetchJSON(url, token),
   },

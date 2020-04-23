@@ -9,16 +9,34 @@ spec:
   containers:
     - name: console-gql
       image: quay.io/rawagner/console-gql
+      volumeMounts:
+        - name: graphql-serving-cert
+          readOnly: true
+          mountPath: /app-root/serving-cert
+        - name: service-ca
+          readOnly: true
+          mountPath: /app-root/service-ca
       ports:
         - containerPort: 4000
         - containerPort: 8080
       env:
         - name: k8sTOKEN
-          value: zNHfuATHCY52oHhxbQs7sDVuWQ75kRKXLpeu3XC0Asc
+          value: PmbUaiYtGUMSZOiwd9luvA8hXDa-BcdnqtMXcZ3OHfE
+        - name: service-ca-file
+          value: /app-root/service-ca/service-ca.crt
       resources:
         requests:
           cpu: 1000m
           memory: 1Gi
+  volumes:
+    - name: graphql-serving-cert
+      secret:
+        secretName: graphql-serving-cert
+        defaultMode: 420
+    - name: service-ca
+      configMap:
+        name: service-ca
+        defaultMode: 420
 
 
 

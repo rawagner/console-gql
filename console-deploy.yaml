@@ -1,0 +1,204 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: rawagner-console
+  namespace: openshift-console
+  labels:
+    app: rawagner-console
+    component: rawagner-ui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rawagner-console
+      component: rawagner-ui
+  template:
+    metadata:
+      name: console
+      creationTimestamp: null
+      labels:
+        app: rawagner-console
+        component: rawagner-ui
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/master: ''
+      restartPolicy: Always
+      serviceAccountName: console
+      schedulerName: default-scheduler
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: console
+                topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 40
+      securityContext: {}
+      containers:
+        - resources:
+            requests:
+              cpu: 10m
+              memory: 100Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8443
+              scheme: HTTPS
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - sleep
+                  - '25'
+          name: console
+          command:
+            - /opt/bridge/bin/bridge
+            - '--public-dir=/opt/bridge/static'
+            - '--config=/var/console-config/console-config.yaml'
+            - '--service-ca-file=/var/service-ca/service-ca.crt'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 150
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          ports:
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: console-serving-cert
+              readOnly: true
+              mountPath: /var/serving-cert
+            - name: console-oauth-config
+              readOnly: true
+              mountPath: /var/oauth-config
+            - name: console-config
+              readOnly: true
+              mountPath: /var/console-config
+            - name: service-ca
+              readOnly: true
+              mountPath: /var/service-ca
+            - name: default-ingress-cert
+              readOnly: true
+              mountPath: /var/default-ingress-cert
+            - name: trusted-ca-bundle
+              readOnly: true
+              mountPath: /etc/pki/ca-trust/extracted/pem
+          terminationMessagePolicy: FallbackToLogsOnError
+          image: >-
+            quay.io/rawagner/console
+      serviceAccount: console
+      volumes:
+        - name: console-serving-cert
+          secret:
+            secretName: console-serving-cert
+            defaultMode: 420
+        - name: console-oauth-config
+          secret:
+            secretName: console-oauth-config
+            defaultMode: 420
+        - name: console-config
+          configMap:
+            name: console-config
+            defaultMode: 420
+        - name: service-ca
+          configMap:
+            name: service-ca
+            defaultMode: 420
+        - name: default-ingress-cert
+          configMap:
+            name: default-ingress-cert
+            defaultMode: 420
+        - name: trusted-ca-bundle
+          configMap:
+            name: trusted-ca-bundle
+            items:
+              - key: ca-bundle.crt
+                path: tls-ca-bundle.pem
+            defaultMode: 420
+      dnsPolicy: ClusterFirst
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - key: node.kubernetes.io/unreachable
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 120
+        - key: node.kubernetes.io/not-reachable
+          operator: Exists
+          effect: NoExecute
+          tolerationSeconds: 120
+      priorityClassName: system-cluster-critical
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+
+
+
+
+
+
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: rawagner-console
+  namespace: openshift-console
+  labels:
+    app: rawagner-console
+spec:
+  ports:
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 8443
+  selector:
+    app: rawagner-console
+    component: rawagner-ui
+  type: ClusterIP
+  sessionAffinity: None
+
+
+
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: rawagner-console
+  namespace: openshift-console
+  labels:
+    app: rawagner-console
+  annotations:
+    openshift.io/host.generated: 'true'
+spec:
+  host: rawagner-console-openshift-console.apps.u02.test.metalkube.org
+  to:
+    kind: Service
+    name: rawagner-console
+    weight: 100
+  port:
+    targetPort: https
+  tls:
+    termination: reencrypt
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+
+
+

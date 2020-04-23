@@ -19,31 +19,27 @@ export class K8sAPI extends RESTDataSource {
     return this.postJSON(url, opts, token);
   }
 
-  fetchJSON = async (path, token) => {
-    return await this.get(
-      path,
-      null,
-      {
-        agent: new Agent({ rejectUnauthorized: false }),
-        headers: {
-          Authorization: token,
-        },
-      }
-    );
-  }
+  fetchJSON = (path, token) => this.get(
+    path,
+    null,
+    {
+      agent: new Agent({ rejectUnauthorized: false }),
+      headers: {
+        Authorization: token,
+      },
+    }
+  );
 
-  postJSON = async (path, body, token) => {
-    return await this.post(
-      path,
-      body,
-      {
-        agent: new Agent({ rejectUnauthorized: false }),
-        headers: {
-          Authorization: token,
-        }
+  postJSON = (path, body, token) => this.post(
+    path,
+    body,
+    {
+      agent: new Agent({ rejectUnauthorized: false }),
+      headers: {
+        Authorization: token,
       }
-    )
-  }
+    }
+  );
 
   fetchWithParams = (kind, params = { ns : null}, token) => {
     const query = _.map(_.omit(params, 'ns'), (v, k) => {

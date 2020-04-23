@@ -1,0 +1,377 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  generateName: example-c55674dfd-
+  annotations:
+    openshift.io/scc: restricted
+  selfLink: /api/v1/namespaces/rawagner/pods/example-c55674dfd-229dz
+  resourceVersion: '99591'
+  name: example-c55674dfd-229dz
+  uid: 2fc16b2e-0795-4be8-a485-0ba27aeaccfb
+  creationTimestamp: '2020-04-26T13:31:28Z'
+  managedFields:
+    - manager: kube-controller-manager
+      operation: Update
+      apiVersion: v1
+      time: '2020-04-26T13:31:28Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:generateName': {}
+          'f:labels':
+            .: {}
+            'f:app': {}
+            'f:pod-template-hash': {}
+          'f:ownerReferences':
+            .: {}
+            'k:{"uid":"2e50815e-2277-4e6f-a017-8088e5120582"}':
+              .: {}
+              'f:apiVersion': {}
+              'f:blockOwnerDeletion': {}
+              'f:controller': {}
+              'f:kind': {}
+              'f:name': {}
+              'f:uid': {}
+        'f:spec':
+          'f:containers':
+            'k:{"name":"hello-openshift"}':
+              .: {}
+              'f:image': {}
+              'f:imagePullPolicy': {}
+              'f:name': {}
+              'f:ports':
+                .: {}
+                'k:{"containerPort":8080,"protocol":"TCP"}':
+                  .: {}
+                  'f:containerPort': {}
+                  'f:protocol': {}
+              'f:resources': {}
+              'f:terminationMessagePath': {}
+              'f:terminationMessagePolicy': {}
+          'f:dnsPolicy': {}
+          'f:enableServiceLinks': {}
+          'f:restartPolicy': {}
+          'f:schedulerName': {}
+          'f:securityContext': {}
+          'f:terminationGracePeriodSeconds': {}
+    - manager: kube-scheduler
+      operation: Update
+      apiVersion: v1
+      time: '2020-04-26T13:32:22Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:conditions':
+            .: {}
+            'k:{"type":"PodScheduled"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:message': {}
+              'f:reason': {}
+              'f:status': {}
+              'f:type': {}
+  namespace: rawagner
+  ownerReferences:
+    - apiVersion: apps/v1
+      kind: ReplicaSet
+      name: example-c55674dfd
+      uid: 2e50815e-2277-4e6f-a017-8088e5120582
+      controller: true
+      blockOwnerDeletion: true
+  labels:
+    app: hello-openshift
+    pod-template-hash: c55674dfd
+spec:
+  restartPolicy: Always
+  serviceAccountName: default
+  imagePullSecrets:
+    - name: default-dockercfg-cqp7c
+  priority: 0
+  schedulerName: default-scheduler
+  enableServiceLinks: true
+  terminationGracePeriodSeconds: 30
+  securityContext:
+    seLinuxOptions:
+      level: 's0:c24,c14'
+    fsGroup: 1000580000
+  containers:
+    - resources: {}
+      terminationMessagePath: /dev/termination-log
+      name: hello-openshift
+      securityContext:
+        capabilities:
+          drop:
+            - KILL
+            - MKNOD
+            - SETGID
+            - SETUID
+        runAsUser: 1000580000
+      ports:
+        - containerPort: 8080
+          protocol: TCP
+      imagePullPolicy: Always
+      volumeMounts:
+        - name: default-token-wtgrd
+          readOnly: true
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      terminationMessagePolicy: File
+      image: openshift/hello-openshift
+  serviceAccount: default
+  volumes:
+    - name: default-token-wtgrd
+      secret:
+        secretName: default-token-wtgrd
+        defaultMode: 420
+  dnsPolicy: ClusterFirst
+  tolerations:
+    - key: node.kubernetes.io/not-ready
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 300
+    - key: node.kubernetes.io/unreachable
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 300
+status:
+  phase: Pending
+  conditions:
+    - type: PodScheduled
+      status: 'False'
+      lastProbeTime: null
+      lastTransitionTime: '2020-04-26T13:32:22Z'
+      reason: Unschedulable
+      message: >-
+        0/6 nodes are available: 3 Too many pods, 3 node(s) had taint
+        {node-role.kubernetes.io/master: }, that the pod didn't tolerate.
+  qosClass: BestEffort
+
+
+
+
+======
+kind: Pod
+apiVersion: v1
+metadata:
+  generateName: example-c55674dfd-
+  annotations:
+    k8s.v1.cni.cncf.io/network-status: |-
+      [{
+          "name": "openshift-sdn",
+          "interface": "eth0",
+          "ips": [
+              "10.129.2.14"
+          ],
+          "default": true,
+          "dns": {}
+      }]
+    k8s.v1.cni.cncf.io/networks-status: |-
+      [{
+          "name": "openshift-sdn",
+          "interface": "eth0",
+          "ips": [
+              "10.129.2.14"
+          ],
+          "default": true,
+          "dns": {}
+      }]
+    openshift.io/scc: restricted
+  selfLink: /api/v1/namespaces/rawagner/pods/example-c55674dfd-ds89g
+  resourceVersion: '22984'
+  name: example-c55674dfd-ds89g
+  uid: a64f9e88-f8e4-4bfa-ae29-c6af1145b010
+  creationTimestamp: '2020-04-27T10:47:49Z'
+  managedFields:
+    - manager: kube-controller-manager
+      operation: Update
+      apiVersion: v1
+      time: '2020-04-27T10:47:49Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:generateName': {}
+          'f:labels':
+            .: {}
+            'f:app': {}
+            'f:pod-template-hash': {}
+          'f:ownerReferences':
+            .: {}
+            'k:{"uid":"05623994-c46a-480c-b132-1b77c54b8326"}':
+              .: {}
+              'f:apiVersion': {}
+              'f:blockOwnerDeletion': {}
+              'f:controller': {}
+              'f:kind': {}
+              'f:name': {}
+              'f:uid': {}
+        'f:spec':
+          'f:containers':
+            'k:{"name":"hello-openshift"}':
+              .: {}
+              'f:image': {}
+              'f:imagePullPolicy': {}
+              'f:name': {}
+              'f:ports':
+                .: {}
+                'k:{"containerPort":8080,"protocol":"TCP"}':
+                  .: {}
+                  'f:containerPort': {}
+                  'f:protocol': {}
+              'f:resources': {}
+              'f:terminationMessagePath': {}
+              'f:terminationMessagePolicy': {}
+          'f:dnsPolicy': {}
+          'f:enableServiceLinks': {}
+          'f:restartPolicy': {}
+          'f:schedulerName': {}
+          'f:securityContext': {}
+          'f:terminationGracePeriodSeconds': {}
+    - manager: multus
+      operation: Update
+      apiVersion: v1
+      time: '2020-04-27T10:47:51Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:k8s.v1.cni.cncf.io/network-status': {}
+            'f:k8s.v1.cni.cncf.io/networks-status': {}
+    - manager: kubelet
+      operation: Update
+      apiVersion: v1
+      time: '2020-04-27T10:47:56Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:conditions':
+            'k:{"type":"ContainersReady"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"Initialized"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"Ready"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+          'f:containerStatuses': {}
+          'f:hostIP': {}
+          'f:phase': {}
+          'f:podIP': {}
+          'f:podIPs':
+            .: {}
+            'k:{"ip":"10.129.2.14"}':
+              .: {}
+              'f:ip': {}
+          'f:startTime': {}
+  namespace: rawagner
+  ownerReferences:
+    - apiVersion: apps/v1
+      kind: ReplicaSet
+      name: example-c55674dfd
+      uid: 05623994-c46a-480c-b132-1b77c54b8326
+      controller: true
+      blockOwnerDeletion: true
+  labels:
+    app: hello-openshift
+    pod-template-hash: c55674dfd
+spec:
+  restartPolicy: Always
+  serviceAccountName: default
+  imagePullSecrets:
+    - name: default-dockercfg-5n98l
+  priority: 0
+  schedulerName: default-scheduler
+  enableServiceLinks: true
+  terminationGracePeriodSeconds: 30
+  nodeName: ip-10-0-135-40.us-west-2.compute.internal
+  securityContext:
+    seLinuxOptions:
+      level: 's0:c24,c14'
+    fsGroup: 1000580000
+  containers:
+    - resources: {}
+      terminationMessagePath: /dev/termination-log
+      name: hello-openshift
+      securityContext:
+        capabilities:
+          drop:
+            - KILL
+            - MKNOD
+            - SETGID
+            - SETUID
+        runAsUser: 1000580000
+      ports:
+        - containerPort: 8080
+          protocol: TCP
+      imagePullPolicy: Always
+      volumeMounts:
+        - name: default-token-vdlxk
+          readOnly: true
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      terminationMessagePolicy: File
+      image: openshift/hello-openshift
+  serviceAccount: default
+  volumes:
+    - name: default-token-vdlxk
+      secret:
+        secretName: default-token-vdlxk
+        defaultMode: 420
+  dnsPolicy: ClusterFirst
+  tolerations:
+    - key: node.kubernetes.io/not-ready
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 300
+    - key: node.kubernetes.io/unreachable
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 300
+status:
+  phase: Running
+  conditions:
+    - type: Initialized
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2020-04-27T10:47:49Z'
+    - type: Ready
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2020-04-27T10:47:56Z'
+    - type: ContainersReady
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2020-04-27T10:47:56Z'
+    - type: PodScheduled
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2020-04-27T10:47:49Z'
+  hostIP: 10.0.135.40
+  podIP: 10.129.2.14
+  podIPs:
+    - ip: 10.129.2.14
+  startTime: '2020-04-27T10:47:49Z'
+  containerStatuses:
+    - restartCount: 0
+      started: true
+      ready: true
+      name: hello-openshift
+      state:
+        running:
+          startedAt: '2020-04-27T10:47:55Z'
+      imageID: >-
+        docker.io/openshift/hello-openshift@sha256:aaea76ff622d2f8bcb32e538e7b3cd0ef6d291953f3e7c9f556c1ba5baf47e2e
+      image: 'docker.io/openshift/hello-openshift:latest'
+      lastState: {}
+      containerID: 'cri-o://38777424421c86c51557c24112dd97079776c59b57606d54c009d0724031b8f1'
+  qosClass: BestEffort
+
+
