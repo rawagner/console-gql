@@ -11,7 +11,7 @@
     "apollo-datasource-rest": "^0.8.0",
     "apollo-server-express": "^2.10.1",
     "compression": "^1.7.4",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-graphql": "^0.9.0",
     "fs": "^0.0.1-security",
     "graphql-subscriptions": "^1.1.0",
